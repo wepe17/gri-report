@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="nocturne.css">
+<style>
+  body { margin: 0; overflow: hidden; }
+  a { color: var(--color-accent); }
+  a:hover { color: var(--color-accent-300); }
+  .navbtn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 7px 10px; border: 1px solid transparent; border-radius: var(--radius-md); background: transparent; color: color-mix(in srgb, var(--color-text) 68%, transparent); font: inherit; font-size: 13.5px; cursor: pointer; text-align: left; }
+  .navbtn:hover { background: color-mix(in srgb, var(--color-text) 7%, transparent); color: var(--color-text); }
+  .navbtn[aria-current='page'] { color: var(--color-accent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-accent) 55%, transparent); background: color-mix(in srgb, var(--color-accent) 10%, transparent); }
+  .clickrow { cursor: pointer; }
+  .scroll { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--color-neutral-800) transparent; }
+  .mini { font-size: 11.5px; color: color-mix(in srgb, var(--color-text) 52%, transparent); }
+  select.input { appearance: none; background-image: linear-gradient(45deg, transparent 50%, var(--color-neutral-400) 50%), linear-gradient(135deg, var(--color-neutral-400) 50%, transparent 50%); background-position: calc(100% - 14px) 16px, calc(100% - 9px) 16px; background-size: 5px 5px; background-repeat: no-repeat; padding-right: 28px; }
+  input[type=range] { accent-color: var(--color-accent); width: 100%; }
+</style>
+</helmet>
+<div style="display: flex; height: 100vh; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body)">
+
+  <aside style="width: 236px; flex: none; display: flex; flex-direction: column; gap: 14px; padding: 16px 12px; border-right: 1px solid var(--color-divider)">
+    <div style="display: flex; align-items: baseline; gap: 8px; padding: 0 6px 4px">
+      <span style="font-family: var(--font-heading); font-weight: 500; font-size: 17px; letter-spacing: -0.01em">Sirkular</span>
+      <span class="mini" style="font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase">GRI Suite</span>
+    </div>
+
+    <div style="display: flex; flex-direction: column; gap: 3px">
+      <button class="navbtn" aria-current="{{ nav.dashboard }}" onClick="{{ goDashboard }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 13a9 9 0 0 1 18 0"></path><path d="M12 13l4-3.5"></path><path d="M3 13v3h18v-3"></path></svg>
+        <span>{{ t.navDash }}</span>
+      </button>
+      <button class="navbtn" aria-current="{{ nav.disclosures }}" onClick="{{ goDisclosures }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 6h16M4 12h16M4 18h10"></path></svg>
+        <span>{{ t.navList }}</span>
+        <span class="mini" style="margin-left: auto">{{ counts.total }}</span>
+      </button>
+      <button class="navbtn" aria-current="{{ nav.materiality }}" onClick="{{ goMateriality }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8"></circle><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path></svg>
+        <span>{{ t.navMat }}</span>
+      </button>
+      <button class="navbtn" aria-current="{{ nav.ghg }}" onClick="{{ goGhg }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 18h9a4 4 0 0 0 .4-8A5.5 5.5 0 0 0 6 9.6A3.7 3.7 0 0 0 7 18Z"></path></svg>
+        <span>{{ t.navGhg }}</span>
+      </button>
+      <button class="navbtn" aria-current="{{ nav.review }}" onClick="{{ goReview }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="8.5"></circle><path d="M8.5 12.3l2.4 2.4 4.6-5"></path></svg>
+        <span>{{ t.navReview }}</span>
+        <span class="tag tag-accent-2" style="margin-left: auto; padding: 1px 7px; font-size: 10px">{{ counts.review }}</span>
+      </button>
+      <button class="navbtn" aria-current="{{ nav.report }}" onClick="{{ goReport }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v4h4M9 12h6M9 16h6"></path></svg>
+        <span>{{ t.navReport }}</span>
+      </button>
+      <button class="navbtn" aria-current="{{ nav.admin }}" onClick="{{ goAdmin }}" type="button">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h16M4 12h16M4 17h16"></path></svg>
+        <span>{{ t.navAdmin }}</span>
+      </button>
+    </div>
+
+    <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 0 6px">
+      <div class="mini">{{ t.assurance }}</div>
+      <div style="height: 5px; border-radius: 3px; background: var(--color-neutral-900); overflow: hidden">
+        <div style="{{ readiness.bar }}"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 11.5px">
+        <span class="mini">{{ readiness.label }}</span>
+        <span style="color: var(--color-accent-300)">{{ readiness.pct }}</span>
+      </div>
+      <div class="hr" style="margin: 2px 0"></div>
+      <div style="display: flex; gap: 8px; align-items: center">
+        <div style="width: 26px; height: 26px; flex: none; border-radius: 50%; background: var(--color-accent-800); color: var(--color-accent-100); display: grid; place-items: center; font-size: 11px">{{ me.init }}</div>
+        <div style="min-width: 0">
+          <div style="font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{ me.name }}</div>
+          <div class="mini" style="font-size: 10.5px">{{ me.roleLabel }}</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <main style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+    <header style="display: flex; align-items: center; gap: 10px; padding: 11px 20px; border-bottom: 1px solid var(--color-divider)">
+      <select class="input" style="width: 268px; height: 34px; min-height: 34px" value="{{ entityId }}" onChange="{{ onEntity }}">
+        <sc-for list="{{ entityOpts }}" as="o" hint-placeholder-count="2">
+          <option value="{{ o.id }}">{{ o.name }}</option>
+        </sc-for>
+      </select>
+      <select class="input" style="width: 122px; height: 34px; min-height: 34px" value="{{ periodId }}" onChange="{{ onPeriod }}">
+        <sc-for list="{{ periodOpts }}" as="o" hint-placeholder-count="2">
+          <option value="{{ o.id }}">{{ o.label }}</option>
+        </sc-for>
+      </select>
+      <span class="tag tag-outline">{{ periodMeta }}</span>
+      <div style="margin-left: auto; display: flex; align-items: center; gap: 10px">
+        <select class="input" style="width: 196px; height: 34px; min-height: 34px" value="{{ roleId }}" onChange="{{ onRole }}">
+          <sc-for list="{{ roleOpts }}" as="o" hint-placeholder-count="3">
+            <option value="{{ o.id }}">{{ o.label }}</option>
+          </sc-for>
+        </select>
+        <div class="seg">
+          <label class="seg-opt"><input type="radio" name="lang" checked="{{ langIsId }}" onChange="{{ setLangId }}"><span>ID</span></label>
+          <label class="seg-opt"><input type="radio" name="lang" checked="{{ langIsBi }}" onChange="{{ setLangBi }}"><span>ID · EN</span></label>
+          <label class="seg-opt"><input type="radio" name="lang" checked="{{ langIsEn }}" onChange="{{ setLangEn }}"><span>EN</span></label>
+        </div>
+      </div>
+    </header>
+
+    <sc-if value="{{ readOnly }}" hint-placeholder-val="{{ false }}">
+      <div style="padding: 7px 20px; font-size: 12px; background: color-mix(in srgb, var(--color-accent) 9%, transparent); border-bottom: 1px solid var(--color-divider); color: var(--color-accent-300)">{{ t.readOnlyNote }}</div>
+    </sc-if>
+
+    <div class="scroll" style="flex: 1; padding: 22px 20px 40px">
+
+      <sc-if value="{{ isDashboard }}" hint-placeholder-val="{{ true }}">
+        <div style="display: flex; flex-direction: column; gap: 18px; max-width: 1180px">
+          <div style="display: flex; align-items: flex-end; gap: 16px">
+            <div>
+              <h3 style="margin: 0">{{ t.dashTitle }}</h3>
+              <div class="mini">{{ t.dashSub }}</div>
+            </div>
+            <button class="btn btn-primary" style="margin-left: auto" onClick="{{ openExport }}" type="button">{{ t.exportBtn }}</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px">
+            <sc-for list="{{ kpis }}" as="k" hint-placeholder-count="4">
+              <div class="card elev-sm" style="gap: 4px">
+                <div class="card-kicker">{{ k.kicker }}</div>
+                <div style="font-family: var(--font-heading); font-size: 30px; line-height: 1.05">{{ k.value }}</div>
+                <div class="mini">{{ k.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.35fr 1fr; gap: 12px; align-items: start">
+            <div class="card elev-sm" style="gap: 12px">
+              <div style="display: flex; align-items: baseline; gap: 8px">
+                <div class="card-title">{{ t.bySeries }}</div>
+                <span class="mini" style="margin-left: auto">{{ t.requiredOnly }}</span>
+              </div>
+              <div style="display: flex; flex-direction: column; gap: 11px">
+                <sc-for list="{{ seriesProgress }}" as="s" hint-placeholder-count="5">
+                  <div style="display: flex; flex-direction: column; gap: 5px">
+                    <div style="display: flex; gap: 8px; font-size: 13px">
+                      <span>{{ s.name }}</span>
+                      <span class="mini" style="margin-left: auto">{{ s.count }}</span>
+                      <span style="width: 40px; text-align: right; color: var(--color-accent-300)">{{ s.pctText }}</span>
+                    </div>
+                    <div style="height: 6px; border-radius: 3px; background: var(--color-neutral-900); overflow: hidden; display: flex">
+                      <div style="{{ s.barApproved }}"></div>
+                      <div style="{{ s.barReview }}"></div>
+                      <div style="{{ s.barDraft }}"></div>
+                    </div>
+                  </div>
+                </sc-for>
+              </div>
+              <div style="display: flex; gap: 14px; margin-top: 2px" class="mini">
+                <span style="display: flex; align-items: center; gap: 5px"><i style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-accent-500); display: block"></i>{{ t.stApproved }}</span>
+                <span style="display: flex; align-items: center; gap: 5px"><i style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-accent-700); display: block"></i>{{ t.stReview }}</span>
+                <span style="display: flex; align-items: center; gap: 5px"><i style="width: 8px; height: 8px; border-radius: 2px; background: var(--color-neutral-700); display: block"></i>{{ t.stDraft }}</span>
+              </div>
+            </div>
+
+            <div class="card elev-sm" style="gap: 10px">
+              <div class="card-title">{{ t.deadlines }}</div>
+              <div style="display: flex; flex-direction: column; gap: 2px">
+                <sc-for list="{{ deadlines }}" as="d" hint-placeholder-count="5">
+                  <div class="clickrow" onClick="{{ d.onClick }}" style="display: flex; align-items: center; gap: 9px; padding: 7px 4px; border-radius: var(--radius-sm)">
+                    <span style="font-family: var(--font-heading); font-size: 12.5px; width: 48px; flex: none; color: var(--color-accent-300)">{{ d.code }}</span>
+                    <span style="font-size: 12.5px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{ d.title }}</span>
+                    <span class="mini" style="flex: none">{{ d.pic }}</span>
+                    <span style="{{ d.dueStyle }}">{{ d.due }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </div>
+
+          <div class="card elev-sm" style="gap: 10px">
+            <div class="card-title">{{ t.trailTitle }}</div>
+            <div style="display: flex; flex-direction: column">
+              <sc-for list="{{ activity }}" as="a" hint-placeholder-count="6">
+                <div style="display: grid; grid-template-columns: 92px 62px 1fr 160px; gap: 10px; align-items: center; padding: 8px 2px; border-bottom: 1px solid color-mix(in srgb, var(--color-text) 7%, transparent); font-size: 12.5px">
+                  <span class="mini">{{ a.when }}</span>
+                  <span style="color: var(--color-accent-300); font-family: var(--font-heading)">{{ a.code }}</span>
+                  <span>{{ a.what }}</span>
+                  <span class="mini" style="text-align: right">{{ a.who }}</span>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isList }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 1240px">
+          <div>
+            <h3 style="margin: 0">{{ t.listTitle }}</h3>
+            <div class="mini">{{ listSummary }}</div>
+          </div>
+          <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+            <input class="input" style="width: 250px" placeholder="{{ t.searchPh }}" value="{{ q }}" onChange="{{ onSearch }}">
+            <select class="input" style="width: 190px" value="{{ fSeries }}" onChange="{{ onFSeries }}">
+              <sc-for list="{{ seriesOpts }}" as="o" hint-placeholder-count="3">
+                <option value="{{ o.id }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+            <select class="input" style="width: 158px" value="{{ fStatus }}" onChange="{{ onFStatus }}">
+              <sc-for list="{{ statusOpts }}" as="o" hint-placeholder-count="3">
+                <option value="{{ o.id }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+            <select class="input" style="width: 176px" value="{{ fPic }}" onChange="{{ onFPic }}">
+              <sc-for list="{{ picOpts }}" as="o" hint-placeholder-count="3">
+                <option value="{{ o.id }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+            <label class="radio" style="margin-left: 4px"><input type="checkbox" checked="{{ materialOnly }}" onChange="{{ onMaterialOnly }}"><span class="dot"></span><span>{{ t.materialOnly }}</span></label>
+            <button class="btn btn-secondary" style="margin-left: auto" onClick="{{ resetFilters }}" type="button">{{ t.reset }}</button>
+          </div>
+
+          <div class="card elev-sm" style="padding: var(--space-2) 0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th style="width: 82px; padding-left: 16px">{{ t.colCode }}</th>
+                  <th>{{ t.colTitle }}</th>
+                  <th style="width: 134px">{{ t.colStatus }}</th>
+                  <th style="width: 150px">{{ t.colPic }}</th>
+                  <th style="width: 104px">{{ t.colDue }}</th>
+                  <th style="width: 92px; padding-right: 16px">{{ t.colEvidence }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ rows }}" as="r" hint-placeholder-count="12">
+                  <tr class="clickrow" onClick="{{ r.onClick }}">
+                    <td style="padding-left: 16px; font-family: var(--font-heading); color: var(--color-accent-300); white-space: nowrap">{{ r.code }}</td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 7px">
+                        <span>{{ r.title }}</span>
+                        <sc-if value="{{ r.material }}" hint-placeholder-val="{{ false }}">
+                          <span class="tag tag-outline" style="padding: 1px 6px; font-size: 10px">{{ t.material }}</span>
+                        </sc-if>
+                      </div>
+                      <div class="mini">{{ r.sub }}</div>
+                    </td>
+                    <td><span class="tag {{ r.tagClass }}">{{ r.statusLabel }}</span></td>
+                    <td>
+                      <div style="display: flex; align-items: center; gap: 7px">
+                        <span style="width: 22px; height: 22px; flex: none; border-radius: 50%; background: var(--color-neutral-800); display: grid; place-items: center; font-size: 10px">{{ r.picInit }}</span>
+                        <span style="font-size: 12.5px">{{ r.picUnit }}</span>
+                      </div>
+                    </td>
+                    <td style="{{ r.dueStyle }}">{{ r.due }}</td>
+                    <td style="padding-right: 16px" class="mini">{{ r.ev }}</td>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+            <div class="mini" style="padding: 8px 16px 2px">{{ listMore }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isDetail }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 1180px">
+          <button class="btn btn-ghost" style="align-self: flex-start" onClick="{{ goDisclosures }}" type="button">← {{ t.backList }}</button>
+          <div style="display: flex; align-items: flex-start; gap: 14px">
+            <div style="min-width: 0">
+              <div style="display: flex; align-items: center; gap: 9px; margin-bottom: 5px">
+                <span class="tag tag-neutral">{{ d.std }}</span>
+                <span class="tag {{ d.tagClass }}">{{ d.statusLabel }}</span>
+                <sc-if value="{{ d.material }}" hint-placeholder-val="{{ false }}">
+                  <span class="tag tag-outline">{{ d.materialTopic }}</span>
+                </sc-if>
+              </div>
+              <h4 style="margin: 0"><span style="color: var(--color-accent-300)">{{ d.code }}</span> · {{ d.title }}</h4>
+              <div class="mini">{{ d.subtitle }}</div>
+            </div>
+            <div style="margin-left: auto; display: flex; gap: 8px; flex: none">
+              <button class="btn btn-secondary" onClick="{{ saveDraft }}" disabled="{{ readOnly }}" type="button">{{ t.saveDraft }}</button>
+              <button class="btn btn-primary" onClick="{{ submitReview }}" disabled="{{ d.submitDisabled }}" type="button">{{ d.submitLabel }}</button>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 12px; align-items: start">
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div class="card elev-sm" style="gap: 12px">
+                <div class="card-title">{{ t.dataEntry }}</div>
+
+                <sc-if value="{{ d.isQuant }}" hint-placeholder-val="{{ true }}">
+                  <div style="display: grid; grid-template-columns: 1.1fr 0.8fr 0.8fr; gap: 10px">
+                    <div class="field"><label>{{ t.value }}</label><input class="input" value="{{ d.value }}" onChange="{{ onValue }}" disabled="{{ readOnly }}"></div>
+                    <div class="field"><label>{{ t.unit }}</label><input class="input" value="{{ d.unit }}" onChange="{{ onUnit }}" disabled="{{ readOnly }}"></div>
+                    <div class="field"><label>{{ t.prevYear }}</label><input class="input" value="{{ d.prev }}" readOnly="{{ true }}"></div>
+                  </div>
+                  <div class="mini">{{ d.deltaNote }}</div>
+                </sc-if>
+
+                <sc-if value="{{ d.isTable }}" hint-placeholder-val="{{ false }}">
+                  <table class="table" style="font-size: 13px">
+                    <thead><tr><th>{{ t.breakdown }}</th><th style="width: 130px">{{ t.value }}</th><th style="width: 96px">{{ t.unit }}</th></tr></thead>
+                    <tbody>
+                      <sc-for list="{{ d.breakdown }}" as="b" hint-placeholder-count="4">
+                        <tr>
+                          <td>{{ b.label }}</td>
+                          <td><input class="input" style="min-height: 30px; padding: 3px 8px" value="{{ b.value }}" onChange="{{ b.onChange }}" disabled="{{ readOnly }}"></td>
+                          <td class="mini">{{ b.unit }}</td>
+                        </tr>
+                      </sc-for>
+                    </tbody>
+                  </table>
+                </sc-if>
+
+                <div class="field"><label>{{ t.narrative }}</label><textarea class="input" value="{{ d.narrative }}" onChange="{{ onNarrative }}" disabled="{{ readOnly }}"></textarea></div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                  <div class="field"><label>{{ t.method }}</label><input class="input" value="{{ d.method }}" onChange="{{ onMethod }}" disabled="{{ readOnly }}"></div>
+                  <div class="field"><label>{{ t.boundary }}</label><input class="input" value="{{ d.boundary }}" onChange="{{ onBoundary }}" disabled="{{ readOnly }}"></div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px">
+                  <div class="field"><label>{{ t.source }}</label><input class="input" value="{{ d.source }}" onChange="{{ onSource }}" disabled="{{ readOnly }}"></div>
+                  <div class="field"><label>{{ t.omissionLabel }}</label>
+                    <select class="input" value="{{ d.omission }}" onChange="{{ onOmission }}" disabled="{{ readOnly }}">
+                      <sc-for list="{{ omissionOpts }}" as="o" hint-placeholder-count="4">
+                        <option value="{{ o.id }}">{{ o.label }}</option>
+                      </sc-for>
+                    </select>
+                  </div>
+                </div>
+              </div>
+
+              <div class="card elev-sm" style="gap: 10px">
+                <div style="display: flex; align-items: center">
+                  <div class="card-title">{{ t.evidence }}</div>
+                  <button class="btn btn-ghost" style="margin-left: auto" onClick="{{ addEvidence }}" disabled="{{ readOnly }}" type="button">+ {{ t.addEvidence }}</button>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 6px">
+                  <sc-for list="{{ d.evidence }}" as="e" hint-placeholder-count="2">
+                    <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--color-text) 4%, transparent)">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.6"><path d="M6 3h8l4 4v14H6z"></path><path d="M14 3v4h4"></path></svg>
+                      <span style="font-size: 12.5px">{{ e.name }}</span>
+                      <span class="mini" style="margin-left: auto">{{ e.meta }}</span>
+                    </div>
+                  </sc-for>
+                  <sc-if value="{{ d.noEvidence }}" hint-placeholder-val="{{ false }}">
+                    <div class="mini">{{ t.noEvidence }}</div>
+                  </sc-if>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div class="card elev-sm" style="gap: 9px">
+                <div class="card-title">{{ t.assignment }}</div>
+                <div class="field"><label>{{ t.colPic }}</label>
+                  <select class="input" value="{{ d.pic }}" onChange="{{ onPic }}" disabled="{{ readOnly }}">
+                    <sc-for list="{{ peopleOpts }}" as="o" hint-placeholder-count="3">
+                      <option value="{{ o.id }}">{{ o.label }}</option>
+                    </sc-for>
+                  </select>
+                </div>
+                <div class="field"><label>{{ t.colDue }}</label><input class="input" type="date" value="{{ d.due }}" onChange="{{ onDue }}" disabled="{{ readOnly }}"></div>
+                <div class="mini">{{ d.reqNote }}</div>
+              </div>
+
+              <div class="card elev-sm" style="gap: 8px">
+                <div class="card-title">{{ t.audit }}</div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <sc-for list="{{ d.trail }}" as="ev" hint-placeholder-count="3">
+                    <div style="display: flex; gap: 9px; align-items: flex-start">
+                      <span style="width: 6px; height: 6px; margin-top: 6px; flex: none; border-radius: 50%; background: var(--color-accent-600)"></span>
+                      <div style="min-width: 0">
+                        <div style="font-size: 12.5px">{{ ev.what }}</div>
+                        <div class="mini">{{ ev.meta }}</div>
+                      </div>
+                    </div>
+                  </sc-for>
+                </div>
+              </div>
+
+              <div class="card elev-sm" style="gap: 9px">
+                <div class="card-title">{{ t.comments }}</div>
+                <div style="display: flex; flex-direction: column; gap: 8px">
+                  <sc-for list="{{ d.comments }}" as="c" hint-placeholder-count="1">
+                    <div style="padding: 8px 10px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--color-text) 4%, transparent)">
+                      <div style="font-size: 12.5px">{{ c.text }}</div>
+                      <div class="mini">{{ c.meta }}</div>
+                    </div>
+                  </sc-for>
+                </div>
+                <div style="display: flex; gap: 8px">
+                  <input class="input" placeholder="{{ t.commentPh }}" value="{{ draftComment }}" onChange="{{ onDraftComment }}">
+                  <button class="btn btn-secondary" onClick="{{ addComment }}" type="button">{{ t.send }}</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isMat }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 1280px">
+          <div style="display: flex; align-items: flex-end; gap: 16px">
+            <div>
+              <h3 style="margin: 0">{{ t.matTitle }}</h3>
+              <div class="mini">{{ t.matSub }}</div>
+            </div>
+            <span class="tag tag-accent" style="margin-left: auto">{{ matSummary }}</span>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 400px; gap: 12px; align-items: start">
+            <div class="card elev-sm" style="padding: var(--space-2) 0">
+              <table class="table" style="font-size: 13px">
+                <thead>
+                  <tr>
+                    <th style="width: 56px; padding-left: 16px">{{ t.colTopicNo }}</th>
+                    <th>{{ t.colTopic }}</th>
+                    <th style="width: 136px">{{ t.colImpact }}</th>
+                    <th style="width: 136px">{{ t.colStake }}</th>
+                    <th style="width: 92px">{{ t.colLinked }}</th>
+                    <th style="width: 100px; padding-right: 16px">{{ t.colMaterial }}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ matRows }}" as="m" hint-placeholder-count="10">
+                    <tr>
+                      <td style="padding-left: 16px; font-family: var(--font-heading); color: var(--color-accent-300)">{{ m.code }}</td>
+                      <td>{{ m.name }}</td>
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 8px">
+                          <input type="range" min="1" max="5" step="0.5" value="{{ m.impact }}" onChange="{{ m.onImpact }}" disabled="{{ readOnly }}">
+                          <span class="mini" style="width: 22px">{{ m.impactText }}</span>
+                        </div>
+                      </td>
+                      <td>
+                        <div style="display: flex; align-items: center; gap: 8px">
+                          <input type="range" min="1" max="5" step="0.5" value="{{ m.stake }}" onChange="{{ m.onStake }}" disabled="{{ readOnly }}">
+                          <span class="mini" style="width: 22px">{{ m.stakeText }}</span>
+                        </div>
+                      </td>
+                      <td class="mini">{{ m.linked }}</td>
+                      <td style="padding-right: 16px">
+                        <label class="radio"><input type="checkbox" checked="{{ m.material }}" onChange="{{ m.onToggle }}"><span class="dot"></span><span style="font-size: 12px">{{ m.materialText }}</span></label>
+                      </td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 12px">
+              <div class="card elev-sm" style="gap: 10px">
+                <div class="card-title">{{ t.matrix }}</div>
+                <div style="position: relative; height: 320px; border-left: 1px solid var(--color-divider); border-bottom: 1px solid var(--color-divider); margin: 6px 10px 24px 32px">
+                  <div style="position: absolute; inset: 0; background: linear-gradient(to top right, transparent 55%, color-mix(in srgb, var(--color-accent) 12%, transparent))"></div>
+                  <sc-for list="{{ matDots }}" as="p" hint-placeholder-count="10">
+                    <div title="{{ p.name }}" style="{{ p.style }}"></div>
+                  </sc-for>
+                  <span class="mini" style="position: absolute; left: -28px; top: 34%; transform: rotate(-90deg); white-space: nowrap">{{ t.axisY }}</span>
+                  <span class="mini" style="position: absolute; bottom: -20px; left: 0">{{ t.axisX }}</span>
+                </div>
+                <div class="mini">{{ t.matrixNote }}</div>
+              </div>
+              <div class="card elev-sm" style="gap: 8px">
+                <div class="card-title">{{ t.gri3Impact }}</div>
+                <p class="card-body">{{ matImpactNote }}</p>
+                <button class="btn btn-secondary" onClick="{{ goDisclosures }}" type="button">{{ t.viewRequired }}</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isGhg }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 1180px">
+          <div style="display: flex; align-items: flex-end; gap: 16px">
+            <div>
+              <h3 style="margin: 0">{{ t.ghgTitle }}</h3>
+              <div class="mini">{{ t.ghgSub }}</div>
+            </div>
+            <button class="btn btn-primary" style="margin-left: auto" onClick="{{ pushGhg }}" disabled="{{ readOnly }}" type="button">{{ t.pushGhg }}</button>
+          </div>
+
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px">
+            <sc-for list="{{ ghgCards }}" as="c" hint-placeholder-count="4">
+              <div class="card elev-sm" style="gap: 4px">
+                <div class="card-kicker">{{ c.kicker }}</div>
+                <div style="font-family: var(--font-heading); font-size: 27px; line-height: 1.05">{{ c.value }}</div>
+                <div class="mini">{{ c.sub }}</div>
+              </div>
+            </sc-for>
+          </div>
+
+          <sc-for list="{{ ghgGroups }}" as="g" hint-placeholder-count="3">
+            <div class="card elev-sm" style="padding: var(--space-2) 0; gap: 0">
+              <div style="display: flex; align-items: baseline; gap: 10px; padding: 6px 16px 4px">
+                <div class="card-title">{{ g.title }}</div>
+                <span class="mini">{{ g.note }}</span>
+                <span style="margin-left: auto; font-family: var(--font-heading); color: var(--color-accent-300)">{{ g.total }}</span>
+              </div>
+              <table class="table" style="font-size: 13px">
+                <thead>
+                  <tr>
+                    <th style="padding-left: 16px">{{ t.colActivity }}</th>
+                    <th style="width: 130px">{{ t.colQty }}</th>
+                    <th style="width: 92px">{{ t.unit }}</th>
+                    <th style="width: 148px">{{ t.colFactor }}</th>
+                    <th style="width: 176px">{{ t.colSource }}</th>
+                    <th style="width: 130px; padding-right: 16px; text-align: right">tCO₂e</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="4">
+                    <tr>
+                      <td style="padding-left: 16px">{{ r.name }}</td>
+                      <td><input class="input" style="min-height: 30px; padding: 3px 8px" value="{{ r.qty }}" onChange="{{ r.onQty }}" disabled="{{ readOnly }}"></td>
+                      <td class="mini">{{ r.unit }}</td>
+                      <td class="mini">{{ r.factor }}</td>
+                      <td class="mini">{{ r.src }}</td>
+                      <td style="padding-right: 16px; text-align: right; font-family: var(--font-heading)">{{ r.co2e }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </sc-for>
+
+          <div class="card elev-sm" style="gap: 8px">
+            <div class="card-title">{{ t.intensity }}</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1.4fr; gap: 14px; align-items: end">
+              <div class="field"><label>{{ t.production }}</label><input class="input" value="{{ production }}" onChange="{{ onProduction }}" disabled="{{ readOnly }}"></div>
+              <div class="field"><label>{{ t.revenue }}</label><input class="input" value="{{ revenue }}" onChange="{{ onRevenue }}" disabled="{{ readOnly }}"></div>
+              <div class="mini">{{ intensityNote }}</div>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReview }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 16px; max-width: 1100px">
+          <div>
+            <h3 style="margin: 0">{{ t.reviewTitle }}</h3>
+            <div class="mini">{{ reviewSummary }}</div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px">
+            <sc-for list="{{ queue }}" as="r" hint-placeholder-count="4">
+              <div class="card elev-sm" style="gap: 10px">
+                <div style="display: flex; align-items: flex-start; gap: 12px">
+                  <div style="min-width: 0">
+                    <div style="display: flex; align-items: center; gap: 8px">
+                      <span style="font-family: var(--font-heading); color: var(--color-accent-300)">{{ r.code }}</span>
+                      <span style="font-size: 14px">{{ r.title }}</span>
+                    </div>
+                    <div class="mini">{{ r.sub }}</div>
+                  </div>
+                  <div style="margin-left: auto; display: flex; gap: 8px; flex: none">
+                    <button class="btn btn-ghost" onClick="{{ r.onOpen }}" type="button">{{ t.open }}</button>
+                    <button class="btn btn-secondary" onClick="{{ r.onReturn }}" disabled="{{ cantApprove }}" type="button">{{ t.returnBtn }}</button>
+                    <button class="btn btn-primary" onClick="{{ r.onApprove }}" disabled="{{ cantApprove }}" type="button">{{ t.approve }}</button>
+                  </div>
+                </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; padding-top: 8px; border-top: 1px solid color-mix(in srgb, var(--color-text) 7%, transparent)">
+                  <div><div class="mini">{{ t.value }}</div><div style="font-size: 13px">{{ r.value }}</div></div>
+                  <div><div class="mini">{{ t.prevYear }}</div><div style="font-size: 13px">{{ r.prev }}</div></div>
+                  <div><div class="mini">{{ t.colEvidence }}</div><div style="font-size: 13px">{{ r.ev }}</div></div>
+                  <div><div class="mini">{{ t.submittedBy }}</div><div style="font-size: 13px">{{ r.by }}</div></div>
+                </div>
+              </div>
+            </sc-for>
+            <sc-if value="{{ queueEmpty }}" hint-placeholder-val="{{ false }}">
+              <div class="card elev-sm"><p class="card-body">{{ t.queueEmpty }}</p></div>
+            </sc-if>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isReport }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 1300px">
+          <div style="display: flex; align-items: flex-end; gap: 16px">
+            <div>
+              <h3 style="margin: 0">{{ t.indexTitle }}</h3>
+              <div class="mini">{{ indexSub }}</div>
+            </div>
+            <button class="btn btn-primary" style="margin-left: auto" onClick="{{ openExport }}" type="button">{{ t.exportBtn }}</button>
+          </div>
+          <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap">
+            <select class="input" style="width: 200px" value="{{ fSeries }}" onChange="{{ onFSeries }}">
+              <sc-for list="{{ seriesOpts }}" as="o" hint-placeholder-count="3">
+                <option value="{{ o.id }}">{{ o.label }}</option>
+              </sc-for>
+            </select>
+            <label class="radio"><input type="checkbox" checked="{{ showMapping }}" onChange="{{ onShowMapping }}"><span class="dot"></span><span>{{ t.showMapping }}</span></label>
+            <span class="tag tag-neutral" style="margin-left: auto">{{ omissionCount }}</span>
+          </div>
+          <div class="card elev-sm" style="padding: var(--space-2) 0">
+            <table class="table" style="font-size: 12.5px">
+              <thead>
+                <tr>
+                  <th style="width: 92px; padding-left: 16px">{{ t.colStandard }}</th>
+                  <th>{{ t.colDisclosure }}</th>
+                  <th style="width: 126px">{{ t.colLocation }}</th>
+                  <th style="width: 200px">{{ t.colOmission }}</th>
+                  <sc-if value="{{ showMapping }}" hint-placeholder-val="{{ true }}">
+                    <th style="width: 160px">POJK 51</th>
+                  </sc-if>
+                  <sc-if value="{{ showMapping }}" hint-placeholder-val="{{ true }}">
+                    <th style="width: 180px; padding-right: 16px">IFRS S1/S2</th>
+                  </sc-if>
+                </tr>
+              </thead>
+              <tbody>
+                <sc-for list="{{ indexRows }}" as="r" hint-placeholder-count="14">
+                  <tr>
+                    <td style="padding-left: 16px" class="mini">{{ r.std }}</td>
+                    <td><span style="color: var(--color-accent-300); font-family: var(--font-heading)">{{ r.code }}</span> <span>{{ r.title }}</span></td>
+                    <td class="mini">{{ r.location }}</td>
+                    <td>
+                      <sc-if value="{{ r.needsOmission }}" hint-placeholder-val="{{ false }}">
+                        <select class="input" style="min-height: 28px; padding: 2px 8px; font-size: 12px; background-position: calc(100% - 14px) 12px, calc(100% - 9px) 12px" value="{{ r.omission }}" onChange="{{ r.onOmission }}" disabled="{{ readOnly }}">
+                          <sc-for list="{{ omissionOpts }}" as="o" hint-placeholder-count="4">
+                            <option value="{{ o.id }}">{{ o.label }}</option>
+                          </sc-for>
+                        </select>
+                      </sc-if>
+                      <sc-if value="{{ r.reported }}" hint-placeholder-val="{{ true }}">
+                        <span class="mini">{{ r.reportedText }}</span>
+                      </sc-if>
+                    </td>
+                    <sc-if value="{{ showMapping }}" hint-placeholder-val="{{ true }}">
+                      <td class="mini">{{ r.pojk }}</td>
+                    </sc-if>
+                    <sc-if value="{{ showMapping }}" hint-placeholder-val="{{ true }}">
+                      <td class="mini" style="padding-right: 16px">{{ r.ifrs }}</td>
+                    </sc-if>
+                  </tr>
+                </sc-for>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ isAdmin }}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; flex-direction: column; gap: 14px; max-width: 1180px">
+          <div>
+            <h3 style="margin: 0">{{ t.adminTitle }}</h3>
+            <div class="mini">{{ t.adminSub }}</div>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-items: start">
+            <div class="card elev-sm" style="padding: var(--space-2) 0">
+              <div class="card-title" style="padding: 6px 16px">{{ t.entities }}</div>
+              <table class="table" style="font-size: 12.5px">
+                <thead><tr><th style="padding-left: 16px">{{ t.entity }}</th><th style="width: 150px">{{ t.scope }}</th><th style="width: 96px; padding-right: 16px; text-align: right">{{ t.headcount }}</th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ entityRows }}" as="e" hint-placeholder-count="4">
+                    <tr>
+                      <td style="padding-left: 16px">{{ e.name }}</td>
+                      <td class="mini">{{ e.scope }}</td>
+                      <td style="padding-right: 16px; text-align: right">{{ e.emp }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div class="card elev-sm" style="gap: 10px">
+              <div class="card-title">{{ t.sectorStd }}</div>
+              <div style="display: flex; flex-direction: column; gap: 7px">
+                <sc-for list="{{ sectorRows }}" as="s" hint-placeholder-count="4">
+                  <label class="radio" style="justify-content: flex-start">
+                    <input type="radio" name="sector" checked="{{ s.checked }}" onChange="{{ s.onPick }}"><span class="dot"></span>
+                    <span>{{ s.name }}</span>
+                    <span class="mini" style="margin-left: auto">{{ s.note }}</span>
+                  </label>
+                </sc-for>
+              </div>
+              <div class="mini">{{ sectorNote }}</div>
+            </div>
+            <div class="card elev-sm" style="padding: var(--space-2) 0">
+              <div class="card-title" style="padding: 6px 16px">{{ t.users }}</div>
+              <table class="table" style="font-size: 12.5px">
+                <thead><tr><th style="padding-left: 16px">{{ t.name }}</th><th style="width: 176px">{{ t.role }}</th><th style="width: 100px; padding-right: 16px; text-align: right">{{ t.assigned }}</th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ userRows }}" as="u" hint-placeholder-count="5">
+                    <tr>
+                      <td style="padding-left: 16px">
+                        <div style="display: flex; align-items: center; gap: 8px">
+                          <span style="width: 22px; height: 22px; flex: none; border-radius: 50%; background: var(--color-neutral-800); display: grid; place-items: center; font-size: 10px">{{ u.init }}</span>
+                          <span>{{ u.name }}</span>
+                        </div>
+                      </td>
+                      <td class="mini">{{ u.role }}</td>
+                      <td style="padding-right: 16px; text-align: right">{{ u.count }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+            <div class="card elev-sm" style="padding: var(--space-2) 0">
+              <div class="card-title" style="padding: 6px 16px">{{ t.periods }}</div>
+              <table class="table" style="font-size: 12.5px">
+                <thead><tr><th style="padding-left: 16px">{{ t.period }}</th><th style="width: 130px">{{ t.colStatus }}</th><th style="width: 120px; padding-right: 16px">{{ t.colDue }}</th></tr></thead>
+                <tbody>
+                  <sc-for list="{{ periodRows }}" as="p" hint-placeholder-count="3">
+                    <tr>
+                      <td style="padding-left: 16px">{{ p.label }}</td>
+                      <td><span class="tag {{ p.tagClass }}">{{ p.status }}</span></td>
+                      <td style="padding-right: 16px" class="mini">{{ p.due }}</td>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+    </div>
+  </main>
+
+  <sc-if value="{{ dialogExport }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog">
+        <div class="dialog-title">{{ t.exportTitle }}</div>
+        <div class="dialog-body">{{ exportBody }}</div>
+        <div style="display: flex; flex-direction: column; gap: 7px">
+          <sc-for list="{{ exportOpts }}" as="o" hint-placeholder-count="3">
+            <label class="radio"><input type="radio" name="fmt" checked="{{ o.checked }}" onChange="{{ o.onPick }}"><span class="dot"></span><span>{{ o.label }}</span></label>
+          </sc-for>
+        </div>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" onClick="{{ closeDialog }}" type="button">{{ t.cancel }}</button>
+          <button class="btn btn-primary" onClick="{{ doExport }}" type="button">{{ t.generate }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ dialogReturn }}" hint-placeholder-val="{{ false }}">
+    <div class="dialog-backdrop">
+      <div class="dialog">
+        <div class="dialog-title">{{ t.returnTitle }}</div>
+        <div class="dialog-body">{{ returnBody }}</div>
+        <div class="field"><label>{{ t.returnReason }}</label><textarea class="input" value="{{ returnNote }}" onChange="{{ onReturnNote }}"></textarea></div>
+        <div class="dialog-actions">
+          <button class="btn btn-secondary" onClick="{{ closeDialog }}" type="button">{{ t.cancel }}</button>
+          <button class="btn btn-primary" onClick="{{ confirmReturn }}" type="button">{{ t.returnBtn }}</button>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}" hint-placeholder-val="{{ false }}">
+    <div style="position: fixed; left: 50%; bottom: 26px; transform: translateX(-50%); padding: 10px 16px; border-radius: var(--radius-md); background: var(--color-surface); box-shadow: var(--shadow-md); font-size: 13px; display: flex; align-items: center; gap: 9px">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-accent)" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"></circle><path d="M8.5 12.3l2.4 2.4 4.6-5"></path></svg>
+      <span>{{ toast }}</span>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:940},&quot;fillLevel&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;default&quot;:68,&quot;min&quot;:20,&quot;max&quot;:100,&quot;step&quot;:4,&quot;unit&quot;:&quot;%&quot;,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Data seeding&quot;,&quot;label&quot;:&quot;Tingkat kelengkapan data&quot;},&quot;lang&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;id&quot;,&quot;bi&quot;,&quot;en&quot;],&quot;default&quot;:&quot;id&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Tampilan&quot;},&quot;showMapping&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Tampilan&quot;}}">
+class Component extends DCLogic {
+  state = {
+    ready: false, view: 'dashboard', lang: null, sel: '2-1',
+    q: '', fSeries: 'all', fStatus: 'all', fPic: 'all', materialOnly: false,
+    recs: {}, mat: [], ghgQty: {}, production: '21.400', revenue: '38.620',
+    dialog: null, returnNote: '', returnCode: null, fmt: 'index', toast: null,
+    role: 'preparer', entity: 'hq', period: '2025', showMapping: null,
+    draftComment: '', sector: 'gri11',
+  };
+
+  componentDidMount() {
+    const b = document.baseURI;
+    Promise.all([
+      import(new URL('gri-data.js', b).href),
+      import(new URL('gri-logic.js', b).href),
+    ]).then(([D, G]) => { this.D = D; this.G = G; this.rebuild(); });
+  }
+
+  componentDidUpdate(prev) {
+    if (prev.fillLevel !== this.props.fillLevel && this.D) this.rebuild();
+  }
+
+  rebuild() {
+    const flat = this.G.flatten(this.D);
+    this.flat = flat;
+    const ghgQty = {};
+    ['scope1', 'scope2', 'scope3'].forEach(s => this.D.ghgFactors[s].forEach(r => { ghgQty[r.id] = r.qty.toLocaleString('id-ID'); }));
+    this.setState({
+      ready: true,
+      recs: this.G.buildRecords(this.D, flat, Number(this.props.fillLevel ?? 68)),
+      mat: this.G.buildMateriality(this.D),
+      ghgQty,
+    });
+  }
+
+  lang() { return this.state.lang || this.props.lang || 'id'; }
+  L(id, en) { return this.lang() === 'en' ? en : id; }
+  titleOf(f) { return this.lang() === 'en' ? f.en : f.id; }
+  subOf(f) { const l = this.lang(); return l === 'bi' ? f.en : (l === 'en' ? f.topicEn : f.topicId); }
+  person(id) { return this.D.people.find(p => p.id === id) || this.D.people[0]; }
+  set(patch) { this.setState(patch); }
+  meName() { return { preparer: 'Arum Ratnasari', owner: 'Bayu Prakoso', management: 'Gunawan Kartika', consultant: 'Sinta Nurhaliza', auditor: 'KAP Wijaya & Rekan' }[this.state.role]; }
+  readOnly() { return this.state.role === 'auditor'; }
+  flash(msg) { this.setState({ toast: msg }); clearTimeout(this._t); this._t = setTimeout(() => this.setState({ toast: null }), 2800); }
+
+  patchRec(code, patch, trailWhat) {
+    this.setState(s => {
+      const r = Object.assign({}, s.recs[code], patch);
+      if (trailWhat) r.trail = r.trail.concat([{ what: trailWhat, meta: '12 Agu 2026 · ' + this.meName() }]);
+      const recs = Object.assign({}, s.recs); recs[code] = r;
+      return { recs };
+    });
+  }
+
+  requiredCodes() {
+    const req = new Set();
+    this.flat.forEach(f => { if (f.series === 'universal') req.add(f.code); });
+    this.state.mat.forEach(m => { if (m.material) m.codes.forEach(c => req.add(c)); });
+    return req;
+  }
+
+  narrativeOf(rec, f) {
+    if (rec.narrative !== null && rec.narrative !== undefined) return rec.narrative;
+    if (rec.status === 'empty') return '';
+    return 'Perseroan mengelola ' + f.id.toLowerCase() + ' melalui kebijakan keberlanjutan yang ditetapkan Direksi dan dievaluasi setiap semester. Data dikumpulkan dari sistem operasional, direkonsiliasi oleh Divisi Sustainability, lalu diverifikasi pemilik data sebelum diajukan untuk review.';
+  }
+
+  ghgTotals() {
+    const q = this.state.ghgQty, num = this.G.num;
+    const sum = k => this.D.ghgFactors[k].reduce((a, r) => a + num(q[r.id]) * r.factor / 1000, 0);
+    const s1 = sum('scope1'), s2 = sum('scope2'), s3 = sum('scope3');
+    return { s1: s1, s2: s2, s3: s3, all: s1 + s2 + s3 };
+  }
+
+  renderVals() {
+    const V = {};
+    this.vShell(V);
+    if (this.state.ready) {
+      this.vDash(V); this.vList(V); this.vDetail(V);
+      this.vMat(V); this.vGhg(V); this.vReview(V); this.vReport(V); this.vAdmin(V);
+    }
+    return V;
+  }
+  vShell(V) {
+    const l = this.lang(), L = (a, b) => this.L(a, b);
+    V.t = this.G ? this.G.strings(l) : {};
+    const view = this.state.view;
+    V.nav = {};
+    ['dashboard', 'disclosures', 'materiality', 'ghg', 'review', 'report', 'admin'].forEach(k => {
+      V.nav[k] = (view === k || (k === 'disclosures' && view === 'detail')) ? 'page' : 'false';
+    });
+    V.isDashboard = view === 'dashboard'; V.isList = view === 'disclosures'; V.isDetail = view === 'detail';
+    V.isMat = view === 'materiality'; V.isGhg = view === 'ghg'; V.isReview = view === 'review';
+    V.isReport = view === 'report'; V.isAdmin = view === 'admin';
+    V.goDashboard = () => this.set({ view: 'dashboard' });
+    V.goDisclosures = () => this.set({ view: 'disclosures' });
+    V.goMateriality = () => this.set({ view: 'materiality' });
+    V.goGhg = () => this.set({ view: 'ghg' });
+    V.goReview = () => this.set({ view: 'review' });
+    V.goReport = () => this.set({ view: 'report' });
+    V.goAdmin = () => this.set({ view: 'admin' });
+    V.langIsId = l === 'id'; V.langIsBi = l === 'bi'; V.langIsEn = l === 'en';
+    V.setLangId = () => this.set({ lang: 'id' }); V.setLangBi = () => this.set({ lang: 'bi' }); V.setLangEn = () => this.set({ lang: 'en' });
+    V.readOnly = this.readOnly();
+    V.toast = this.state.toast;
+    V.dialogExport = this.state.dialog === 'export';
+    V.dialogReturn = this.state.dialog === 'return';
+    V.closeDialog = () => this.set({ dialog: null });
+    V.openExport = () => this.set({ dialog: 'export' });
+    V.roleId = this.state.role; V.entityId = this.state.entity; V.periodId = this.state.period;
+    V.onRole = e => this.set({ role: e.target.value });
+    V.onEntity = e => this.set({ entity: e.target.value });
+    V.onPeriod = e => this.set({ period: e.target.value });
+    V.roleOpts = [
+      { id: 'preparer', label: L('Tim Sustainability', 'Sustainability team') },
+      { id: 'owner', label: L('Data owner (HSE/HR/Fin)', 'Data owner (HSE/HR/Fin)') },
+      { id: 'management', label: L('Manajemen (approver)', 'Management (approver)') },
+      { id: 'consultant', label: L('Konsultan', 'Consultant') },
+      { id: 'auditor', label: L('Auditor / assurance', 'Auditor / assurance') },
+    ];
+    const roleLabel = (V.roleOpts.find(r => r.id === this.state.role) || {}).label;
+    V.me = { init: { preparer: 'AR', owner: 'BP', management: 'GK', consultant: 'SN', auditor: 'KW' }[this.state.role], name: this.meName(), roleLabel: roleLabel };
+    V.omissionOpts = [
+      { id: 'none', label: L('— belum dipilih —', '— not selected —') },
+      { id: 'na', label: L('Tidak berlaku', 'Not applicable') },
+      { id: 'legal', label: L('Larangan hukum', 'Legal prohibition') },
+      { id: 'conf', label: L('Batasan kerahasiaan', 'Confidentiality constraints') },
+      { id: 'unavail', label: L('Informasi tidak tersedia / tidak lengkap', 'Information unavailable / incomplete') },
+    ];
+    V.q = this.state.q; V.fSeries = this.state.fSeries; V.fStatus = this.state.fStatus; V.fPic = this.state.fPic;
+    V.materialOnly = this.state.materialOnly;
+    V.showMapping = this.state.showMapping === null ? (this.props.showMapping ?? true) : this.state.showMapping;
+    V.onShowMapping = e => this.set({ showMapping: e.target.checked });
+    V.draftComment = this.state.draftComment; V.returnNote = this.state.returnNote;
+    V.onReturnNote = e => this.set({ returnNote: e.target.value });
+    V.onDraftComment = e => this.set({ draftComment: e.target.value });
+    V.production = this.state.production; V.revenue = this.state.revenue;
+    V.onProduction = e => this.set({ production: e.target.value });
+    V.onRevenue = e => this.set({ revenue: e.target.value });
+    V.cantApprove = !(this.state.role === 'management' || this.state.role === 'consultant');
+    V.exportOpts = [
+      { id: 'index', label: L('GRI content index (XLSX)', 'GRI content index (XLSX)') },
+      { id: 'draft', label: L('Draf laporan keberlanjutan (DOCX)', 'Draft sustainability report (DOCX)') },
+      { id: 'pack', label: L('Paket asurans: data + bukti + jejak audit (ZIP)', 'Assurance pack: data + evidence + audit trail (ZIP)') },
+    ].map(o => ({ id: o.id, label: o.label, checked: this.state.fmt === o.id, onPick: () => this.set({ fmt: o.id }) }));
+    V.doExport = () => { this.set({ dialog: null }); this.flash(L('Berkas dibuat — 3 disclosure masih tanpa alasan penghilangan.', 'File generated — 3 disclosures still lack an omission reason.')); };
+    if (!this.state.ready) {
+      V.counts = { total: '—', review: '—' };
+      V.readiness = { pct: '—', label: L('Memuat standar GRI…', 'Loading GRI standards…'), bar: 'height:100%;width:0%' };
+      V.entityOpts = []; V.periodOpts = []; V.periodMeta = '';
+      ['kpis', 'seriesProgress', 'deadlines', 'activity', 'rows', 'matRows', 'matDots', 'ghgCards', 'ghgGroups', 'queue', 'indexRows', 'entityRows', 'userRows', 'periodRows', 'sectorRows', 'seriesOpts', 'statusOpts', 'picOpts', 'peopleOpts'].forEach(k => { V[k] = []; });
+      V.d = { evidence: [], trail: [], comments: [], breakdown: [] };
+      return;
+    }
+    const D = this.D;
+    V.entityOpts = D.entities.map(e => ({ id: e.id, name: e.name }));
+    V.periodOpts = D.periods.map(p => ({ id: p.id, label: p.label }));
+    const per = D.periods.find(p => p.id === this.state.period);
+    V.periodMeta = per.status === 'open'
+      ? L('Terbuka · tenggat ' + this.G.fmtDue(per.due), 'Open · due ' + this.G.fmtDue(per.due))
+      : L('Sudah terbit', 'Published');
+  }
+
+  vDash(V) {
+    const L = (a, b) => this.L(a, b), D = this.D, G = this.G, recs = this.state.recs, l = this.lang();
+    const req = this.requiredCodes();
+    const reqList = this.flat.filter(f => req.has(f.code));
+    const today = '2026-03-20';
+    const done = reqList.filter(f => recs[f.code].status === 'approved').length;
+    const inRev = this.flat.filter(f => recs[f.code].status === 'review').length;
+    const overdue = reqList.filter(f => recs[f.code].status !== 'approved' && recs[f.code].due < today).length;
+    const noEv = reqList.filter(f => recs[f.code].evidence.length === 0).length;
+    this._req = req; this._reqList = reqList; this._today = today;
+
+    V.counts = { total: this.flat.length, review: inRev };
+    const pct = Math.round((done / Math.max(1, reqList.length)) * 100);
+    V.readiness = {
+      pct: pct + '%',
+      label: L(done + ' dari ' + reqList.length + ' disetujui', done + ' of ' + reqList.length + ' approved'),
+      bar: 'height:100%;width:' + pct + '%;background:var(--color-accent-500);border-radius:3px',
+    };
+    V.kpis = [
+      { kicker: L('Disclosure wajib', 'Required disclosures'), value: reqList.length, sub: L('dari ' + this.flat.length + ' disclosure GRI aktif', 'of ' + this.flat.length + ' active GRI disclosures') },
+      { kicker: L('Selesai & disetujui', 'Complete & approved'), value: pct + '%', sub: done + ' / ' + reqList.length },
+      { kicker: L('Menunggu review', 'Awaiting review'), value: inRev, sub: L('siap diperiksa manajemen', 'ready for management review') },
+      { kicker: L('Perlu perhatian', 'Needs attention'), value: overdue, sub: L('lewat tenggat · ' + noEv + ' tanpa bukti', 'overdue · ' + noEv + ' without evidence') },
+    ];
+    V.seriesProgress = D.series.map(s => {
+      const list = reqList.filter(f => f.series === s.id);
+      const n = Math.max(1, list.length);
+      const cnt = k => list.filter(f => recs[f.code].status === k).length;
+      const a = cnt('approved'), r = cnt('review'), dr = cnt('draft');
+      return {
+        name: l === 'en' ? s.en : s.id_,
+        count: (a + r + dr) + ' / ' + list.length,
+        pctText: Math.round((a / n) * 100) + '%',
+        barApproved: 'width:' + (a / n) * 100 + '%;background:var(--color-accent-500)',
+        barReview: 'width:' + (r / n) * 100 + '%;background:var(--color-accent-700)',
+        barDraft: 'width:' + (dr / n) * 100 + '%;background:var(--color-neutral-700)',
+      };
+    });
+    const dueStyle = r => (r.status !== 'approved' && r.due < today
+      ? 'font-size:12.5px;color:var(--color-accent-300)'
+      : 'font-size:12.5px;color:color-mix(in srgb, var(--color-text) 55%, transparent)');
+    this._dueStyle = dueStyle;
+    V.deadlines = reqList.filter(f => recs[f.code].status !== 'approved')
+      .sort((a, b) => recs[a.code].due.localeCompare(recs[b.code].due)).slice(0, 7)
+      .map(f => ({
+        code: f.code, title: this.titleOf(f), pic: this.person(recs[f.code].pic).unit,
+        due: G.fmtDue(recs[f.code].due), dueStyle: dueStyle(recs[f.code]),
+        onClick: () => this.set({ view: 'detail', sel: f.code }),
+      }));
+    V.activity = this.flat.filter(f => recs[f.code].trail.length > 2).slice(0, 7).map(f => {
+      const tr = recs[f.code].trail[recs[f.code].trail.length - 1];
+      const parts = tr.meta.split(' · ');
+      return { when: parts[0], code: f.code, what: tr.what, who: parts[1] };
+    });
+  }
+  vList(V) {
+    const L = (a, b) => this.L(a, b), D = this.D, G = this.G, recs = this.state.recs, l = this.lang();
+    const SL = G.statusLabels(l), TC = G.tagClasses, req = this._req;
+    V.seriesOpts = [{ id: 'all', label: L('Semua seri', 'All series') }]
+      .concat(D.series.map(s => ({ id: s.id, label: l === 'en' ? s.en : s.id_ })));
+    V.statusOpts = [{ id: 'all', label: L('Semua status', 'All statuses') }]
+      .concat(['approved', 'review', 'draft', 'empty'].map(s => ({ id: s, label: SL[s] })));
+    V.picOpts = [{ id: 'all', label: L('Semua PIC', 'All owners') }].concat(D.people.map(p => ({ id: p.id, label: p.name })));
+    V.peopleOpts = D.people.map(p => ({ id: p.id, label: p.name + ' · ' + p.unit }));
+    V.onSearch = e => this.set({ q: e.target.value });
+    V.onFSeries = e => this.set({ fSeries: e.target.value });
+    V.onFStatus = e => this.set({ fStatus: e.target.value });
+    V.onFPic = e => this.set({ fPic: e.target.value });
+    V.onMaterialOnly = e => this.set({ materialOnly: e.target.checked });
+    V.resetFilters = () => this.set({ q: '', fSeries: 'all', fStatus: 'all', fPic: 'all', materialOnly: false });
+
+    const qq = this.state.q.toLowerCase();
+    const filtered = this.flat.filter(f => {
+      const r = recs[f.code];
+      if (this.state.fSeries !== 'all' && f.series !== this.state.fSeries) return false;
+      if (this.state.fStatus !== 'all' && r.status !== this.state.fStatus) return false;
+      if (this.state.fPic !== 'all' && r.pic !== this.state.fPic) return false;
+      if (this.state.materialOnly && !req.has(f.code)) return false;
+      if (qq && (f.code + ' ' + f.en + ' ' + f.id).toLowerCase().indexOf(qq) === -1) return false;
+      return true;
+    });
+    V.listSummary = L(
+      filtered.length + ' disclosure ditampilkan · ' + this._reqList.length + ' wajib dilaporkan periode ini',
+      filtered.length + ' shown · ' + this._reqList.length + ' required this period');
+    V.listMore = filtered.length > 60
+      ? L('Menampilkan 60 dari ' + filtered.length + ' disclosure — persempit dengan filter di atas.', 'Showing 60 of ' + filtered.length + ' disclosures — narrow the filters above.')
+      : '';
+    V.rows = filtered.slice(0, 60).map(f => {
+      const r = recs[f.code];
+      return {
+        code: f.code, title: this.titleOf(f), sub: this.subOf(f),
+        material: req.has(f.code), statusLabel: SL[r.status], tagClass: TC[r.status],
+        picInit: this.person(r.pic).init, picUnit: this.person(r.pic).unit,
+        due: G.fmtDue(r.due), dueStyle: this._dueStyle(r),
+        ev: r.evidence.length ? r.evidence.length + ' ' + L('berkas', 'files') : '—',
+        onClick: () => this.set({ view: 'detail', sel: f.code }),
+      };
+    });
+  }
+
+  vDetail(V) {
+    const L = (a, b) => this.L(a, b), G = this.G, l = this.lang();
+    const SL = G.statusLabels(l), TC = G.tagClasses;
+    const sel = this.state.sel, f = this.flat.find(x => x.code === sel) || this.flat[0];
+    const r = this.state.recs[f.code];
+    const matTopic = this.state.mat.find(m => m.material && m.codes.indexOf(f.code) !== -1);
+    const req = this._req;
+    V.d = {
+      code: f.code, title: this.titleOf(f), std: f.std,
+      statusLabel: SL[r.status], tagClass: TC[r.status],
+      subtitle: (l === 'en' ? f.topicEn : f.topicId) + (l === 'bi' ? ' · ' + f.en : ''),
+      material: !!matTopic,
+      materialTopic: matTopic ? L('Topik material ' + matTopic.code, 'Material topic ' + matTopic.code) : '',
+      isQuant: f.type === 'q', isTable: f.type === 't',
+      value: r.value, unit: r.unit, prev: r.prev,
+      deltaNote: r.status === 'empty'
+        ? L('Belum ada nilai untuk periode ini.', 'No value recorded for this period yet.')
+        : L('Perubahan terhadap FY 2024 dihitung saat disimpan; deviasi di atas 10% wajib dijelaskan pada narasi (GRI 2-4).', 'Change against FY 2024 is computed on save; deviation above 10% must be explained in the narrative (GRI 2-4).'),
+      breakdown: (f.type === 't'
+        ? [L('Laki-laki', 'Male'), L('Perempuan', 'Female'), L('Usia < 30', 'Under 30'), L('Usia 30–50', 'Age 30–50'), L('Usia > 50', 'Over 50')]
+        : []).map((lab, i) => ({
+          label: lab, unit: r.unit,
+          value: r.status === 'empty' ? '' : String(G.hash(f.code + i) * 7 + 24),
+          onChange: () => {},
+        })),
+      narrative: this.narrativeOf(r, f), method: r.method, boundary: r.boundary, source: r.source, omission: r.omission,
+      evidence: r.evidence, noEvidence: r.evidence.length === 0,
+      pic: r.pic, due: r.due, trail: r.trail, comments: r.comments,
+      reqNote: req.has(f.code)
+        ? L('Wajib — GRI 1 mensyaratkan seluruh disclosure topik material dilaporkan, atau diberi alasan penghilangan yang sah.', 'Required — GRI 1 requires every disclosure of a material topic to be reported, or given a valid omission reason.')
+        : L('Tidak wajib periode ini — topik terkait belum dinilai material pada modul GRI 3.', 'Not required this period — the linked topic is not assessed as material in the GRI 3 module.'),
+      submitLabel: r.status === 'review' ? L('Sedang direview', 'In review') : r.status === 'approved' ? L('Sudah disetujui', 'Approved') : L('Kirim untuk review', 'Submit for review'),
+      submitDisabled: this.readOnly() || r.status === 'review' || r.status === 'approved',
+    };
+    const p = (patch, trail) => this.patchRec(f.code, patch, trail);
+    V.onValue = e => p({ value: e.target.value });
+    V.onUnit = e => p({ unit: e.target.value });
+    V.onNarrative = e => p({ narrative: e.target.value });
+    V.onMethod = e => p({ method: e.target.value });
+    V.onBoundary = e => p({ boundary: e.target.value });
+    V.onSource = e => p({ source: e.target.value });
+    V.onOmission = e => p({ omission: e.target.value }, 'Alasan penghilangan diperbarui');
+    V.onPic = e => p({ pic: e.target.value }, 'PIC dialihkan ke ' + this.person(e.target.value).name);
+    V.onDue = e => p({ due: e.target.value }, 'Tenggat diubah menjadi ' + e.target.value);
+    V.saveDraft = () => {
+      p(r.status === 'empty' ? { status: 'draft' } : {}, 'Draf disimpan');
+      this.flash(L('Draf tersimpan · versi baru tercatat di jejak audit.', 'Draft saved · a new version is recorded in the audit trail.'));
+    };
+    V.submitReview = () => {
+      if (r.evidence.length === 0) { this.flash(L('Lampirkan minimal satu bukti sebelum mengirim untuk review.', 'Attach at least one evidence file before submitting.')); return; }
+      p({ status: 'review' }, 'Dikirim untuk review');
+      this.flash(L(f.code + ' dikirim ke antrean review.', f.code + ' sent to the review queue.'));
+    };
+    V.addEvidence = () => {
+      p({ evidence: r.evidence.concat([{ name: 'Lampiran ' + f.code + '-' + (r.evidence.length + 1) + '.pdf', meta: '640 KB · 12 Agu 2026' }]) }, 'Bukti baru diunggah');
+      this.flash(L('Bukti terlampir.', 'Evidence attached.'));
+    };
+    V.addComment = () => {
+      const text = this.state.draftComment.trim();
+      if (!text) return;
+      this.patchRec(f.code, { comments: r.comments.concat([{ text: text, meta: this.meName() + ' · 12 Agu 2026' }]) }, 'Catatan review ditambahkan');
+      this.set({ draftComment: '' });
+    };
+  }
+  vMat(V) {
+    const L = (a, b) => this.L(a, b), l = this.lang(), mat = this.state.mat;
+    const setMat = (code, patch) => this.setState(s => ({
+      mat: s.mat.map(m => (m.code === code ? Object.assign({}, m, patch) : m)),
+    }));
+    const nMat = mat.filter(m => m.material).length;
+    V.matSummary = L(nMat + ' topik material · ' + this._reqList.length + ' disclosure wajib', nMat + ' material topics · ' + this._reqList.length + ' required disclosures');
+    V.matRows = mat.map(m => ({
+      code: m.code, name: l === 'en' ? m.en : m.id,
+      impact: m.impact, stake: m.stake,
+      impactText: m.impact.toFixed(1), stakeText: m.stake.toFixed(1),
+      linked: m.codes.length + ' × ' + m.codes[0],
+      material: m.material, materialText: m.material ? L('Ya', 'Yes') : L('Tidak', 'No'),
+      onImpact: e => setMat(m.code, { impact: parseFloat(e.target.value) }),
+      onStake: e => setMat(m.code, { stake: parseFloat(e.target.value) }),
+      onToggle: e => setMat(m.code, { material: e.target.checked }),
+    }));
+    V.matDots = mat.map(m => {
+      const x = ((m.impact - 1) / 4) * 100, y = ((m.stake - 1) / 4) * 100;
+      const on = m.material;
+      return {
+        name: (l === 'en' ? m.en : m.id) + ' (' + m.code + ')',
+        style: 'position:absolute;width:' + (on ? 11 : 8) + 'px;height:' + (on ? 11 : 8) + 'px;border-radius:50%;left:calc(' + x + '% - 5px);bottom:calc(' + y + '% - 5px);background:' + (on ? 'var(--color-accent-400)' : 'var(--color-neutral-700)') + ';box-shadow:' + (on ? '0 0 0 3px color-mix(in srgb, var(--color-accent) 22%, transparent)' : 'none'),
+      };
+    });
+    V.matImpactNote = L(
+      'Menandai satu topik sebagai material otomatis menambahkan seluruh disclosure terkaitnya ke daftar wajib dan ke GRI 3-2, dan mewajibkan GRI 3-3 untuk topik tersebut. Saat ini ' + nMat + ' topik aktif.',
+      'Marking a topic material automatically adds all of its linked disclosures to the required set and to GRI 3-2, and makes GRI 3-3 mandatory for that topic. ' + nMat + ' topics are active.');
+  }
+
+  vGhg(V) {
+    const L = (a, b) => this.L(a, b), G = this.G, l = this.lang(), D = this.D;
+    const tot = this.ghgTotals();
+    const prod = G.num(this.state.production), rev = G.num(this.state.revenue);
+    V.ghgCards = [
+      { kicker: L('Total (1+2+3)', 'Total (1+2+3)'), value: G.fmtN(tot.all), sub: 'tCO₂e · GHG Protocol' },
+      { kicker: 'Scope 1 · 305-1', value: G.fmtN(tot.s1), sub: L('pembakaran langsung, flaring, fugitif', 'direct combustion, flaring, fugitives') },
+      { kicker: 'Scope 2 · 305-2', value: G.fmtN(tot.s2), sub: L('location-based, faktor jaringan KESDM', 'location-based, KESDM grid factor') },
+      { kicker: 'Scope 3 · 305-3', value: G.fmtN(tot.s3), sub: L('5 kategori relevan dari 15', '5 relevant categories of 15') },
+    ];
+    const group = (key, title, note) => ({
+      title: title, note: note, total: G.fmtN(key === 'scope1' ? tot.s1 : key === 'scope2' ? tot.s2 : tot.s3) + ' tCO₂e',
+      rows: D.ghgFactors[key].map(r => ({
+        name: l === 'en' ? r.en : r.id_, unit: r.unit,
+        factor: r.factor.toLocaleString('id-ID'), src: r.src,
+        qty: this.state.ghgQty[r.id],
+        co2e: G.fmtN(G.num(this.state.ghgQty[r.id]) * r.factor / 1000),
+        onQty: e => { const v = e.target.value; this.setState(s => { const q = Object.assign({}, s.ghgQty); q[r.id] = v; return { ghgQty: q }; }); },
+      })),
+    });
+    V.ghgGroups = [
+      group('scope1', 'Scope 1 · GRI 305-1', L('emisi langsung dari sumber yang dimiliki atau dikendalikan', 'direct emissions from owned or controlled sources')),
+      group('scope2', 'Scope 2 · GRI 305-2', L('location-based; market-based dilaporkan terpisah bila ada REC', 'location-based; market-based reported separately where RECs exist')),
+      group('scope3', 'Scope 3 · GRI 305-3', L('kategori yang dinilai relevan dan dapat dihitung', 'categories assessed as relevant and calculable')),
+    ];
+    V.intensityNote = L(
+      'Intensitas: ' + (prod ? (tot.all / prod).toFixed(2) : '—') + ' tCO₂e per ribu boe · ' + (rev ? (tot.all / rev).toFixed(2) : '—') + ' tCO₂e per Rp miliar pendapatan. Cakupan: Scope 1+2+3, gas CO₂/CH₄/N₂O, GWP AR5.',
+      'Intensity: ' + (prod ? (tot.all / prod).toFixed(2) : '—') + ' tCO₂e per thousand boe · ' + (rev ? (tot.all / rev).toFixed(2) : '—') + ' tCO₂e per IDR bn revenue. Coverage: Scope 1+2+3, CO₂/CH₄/N₂O, AR5 GWP.');
+    V.pushGhg = () => {
+      const map = { '305-1': tot.s1, '305-2': tot.s2, '305-3': tot.s3, '305-4': prod ? tot.all / prod : 0 };
+      this.setState(s => {
+        const recs = Object.assign({}, s.recs);
+        Object.keys(map).forEach(code => {
+          recs[code] = Object.assign({}, recs[code], {
+            value: code === '305-4' ? map[code].toFixed(2) : G.fmtN(map[code]),
+            status: recs[code].status === 'approved' ? 'review' : 'draft',
+            method: 'GHG Protocol Corporate Standard · IPCC 2006 · GWP AR5',
+            source: 'Kalkulator GRK internal (tertaut)',
+            trail: recs[code].trail.concat([{ what: 'Nilai diperbarui dari kalkulator GRK', meta: '12 Agu 2026 · ' + this.meName() }]),
+          });
+        });
+        return { recs: recs };
+      });
+      this.flash(L('305-1 … 305-4 diperbarui dari kalkulator.', '305-1 … 305-4 updated from the calculator.'));
+    };
+  }
+
+  vReview(V) {
+    const L = (a, b) => this.L(a, b), G = this.G, recs = this.state.recs;
+    const items = this.flat.filter(f => recs[f.code].status === 'review');
+    V.reviewSummary = L(
+      items.length + ' disclosure menunggu keputusan · hanya peran manajemen dan konsultan yang dapat menyetujui',
+      items.length + ' disclosures awaiting decision · only management and consultant roles can approve');
+    V.queueEmpty = items.length === 0;
+    V.queue = items.slice(0, 12).map(f => {
+      const r = recs[f.code];
+      return {
+        code: f.code, title: this.titleOf(f), sub: this.subOf(f) + ' · ' + f.std,
+        value: r.value ? r.value + ' ' + r.unit : '—', prev: r.prev,
+        ev: r.evidence.length ? r.evidence.length + ' ' + L('berkas', 'files') : L('tidak ada', 'none'),
+        by: this.person(r.pic).name,
+        onOpen: () => this.set({ view: 'detail', sel: f.code }),
+        onApprove: () => {
+          this.patchRec(f.code, { status: 'approved' }, 'Disetujui');
+          this.flash(L(f.code + ' disetujui.', f.code + ' approved.'));
+        },
+        onReturn: () => this.set({ dialog: 'return', returnCode: f.code }),
+      };
+    });
+    V.returnBody = L(
+      'Disclosure ' + (this.state.returnCode || '') + ' akan kembali berstatus draf dan PIC menerima notifikasi.',
+      'Disclosure ' + (this.state.returnCode || '') + ' returns to draft status and the owner is notified.');
+    V.confirmReturn = () => {
+      const code = this.state.returnCode;
+      if (code) this.patchRec(code, { status: 'draft' }, 'Dikembalikan ke PIC: ' + (this.state.returnNote || 'perlu perbaikan'));
+      this.set({ dialog: null, returnNote: '' });
+      this.flash(L(code + ' dikembalikan ke PIC.', code + ' returned to the owner.'));
+    };
+    V.exportBody = L(
+      'Berkas dibuat untuk ' + (this.D.entities.find(e => e.id === this.state.entity) || {}).name + ' · ' + (this.D.periods.find(p => p.id === this.state.period) || {}).label + '. Statement of use dan tabel GRI content index dibuat otomatis.',
+      'Files are generated for ' + (this.D.entities.find(e => e.id === this.state.entity) || {}).name + ' · ' + (this.D.periods.find(p => p.id === this.state.period) || {}).label + '. The statement of use and GRI content index table are generated automatically.');
+  }
+  vReport(V) {
+    const L = (a, b) => this.L(a, b), D = this.D, G = this.G, l = this.lang(), recs = this.state.recs;
+    const OM = { none: '', na: L('Tidak berlaku', 'Not applicable'), legal: L('Larangan hukum', 'Legal prohibition'), conf: L('Kerahasiaan', 'Confidentiality'), unavail: L('Informasi tidak tersedia', 'Information unavailable') };
+    const list = this.flat.filter(f => this.state.fSeries === 'all' || f.series === this.state.fSeries);
+    const missing = this.flat.filter(f => this._req.has(f.code) && recs[f.code].status === 'empty' && recs[f.code].omission === 'none');
+    V.omissionCount = L(missing.length + ' disclosure wajib belum punya nilai maupun alasan penghilangan', missing.length + ' required disclosures have neither a value nor an omission reason');
+    V.indexSub = L(
+      'Pernyataan penggunaan: pelaporan sesuai dengan GRI Standards untuk periode 1 Jan – 31 Des 2025 · GRI 1: Landasan 2021 · ' + (D.sectorStandards.find(s => s.id === this.state.sector) || {}).name,
+      'Statement of use: reporting in accordance with the GRI Standards for 1 Jan – 31 Dec 2025 · GRI 1: Foundation 2021 · ' + (D.sectorStandards.find(s => s.id === this.state.sector) || {}).name);
+    V.indexRows = list.map(f => {
+      const r = recs[f.code];
+      const reported = r.status !== 'empty';
+      const map = D.mapping[f.code] || {};
+      return {
+        std: f.std, code: f.code, title: this.titleOf(f),
+        location: reported ? L('Hal. ', 'p. ') + (12 + (G.hash(f.code) % 78)) : (this._req.has(f.code) ? L('— belum ada', '— pending') : L('tidak material', 'not material')),
+        reported: reported, needsOmission: !reported,
+        reportedText: reported ? '—' : '',
+        omission: r.omission,
+        onOmission: e => this.patchRec(f.code, { omission: e.target.value }, 'Alasan penghilangan: ' + OM[e.target.value]),
+        pojk: map.pojk || '—', ifrs: map.ifrs || '—',
+      };
+    });
+  }
+
+  vAdmin(V) {
+    const L = (a, b) => this.L(a, b), D = this.D, G = this.G, l = this.lang(), recs = this.state.recs;
+    V.entityRows = D.entities.map(e => ({
+      name: e.name,
+      scope: e.consolidated ? L('Konsolidasi', 'Consolidated') : L('Di luar konsolidasi', 'Outside consolidation'),
+      emp: e.employees ? e.employees.toLocaleString('id-ID') : '—',
+    }));
+    V.userRows = D.people.map(p => ({
+      init: p.init, name: p.name, role: p.role,
+      count: this.flat.filter(f => recs[f.code].pic === p.id).length,
+    }));
+    V.periodRows = D.periods.map(p => ({
+      label: p.label,
+      status: p.status === 'open' ? L('Terbuka', 'Open') : L('Terbit', 'Published'),
+      tagClass: p.status === 'open' ? 'tag-accent-2' : 'tag-neutral',
+      due: G.fmtDue(p.due),
+    }));
+    V.sectorRows = D.sectorStandards.map(s => ({
+      name: s.name, checked: this.state.sector === s.id,
+      note: this.state.sector === s.id ? L('22 topik dimuat', '22 topics loaded') : '',
+      onPick: () => { this.set({ sector: s.id }); this.flash(L('Standar sektor diganti — daftar topik akan dimuat ulang.', 'Sector standard switched — the topic list reloads.')); },
+    }));
+    V.sectorNote = L(
+      'Standar sektor menentukan topik yang harus dinilai materialitasnya (GRI 3-1) dan, bila dinyatakan tidak material, wajib diberi penjelasan pada content index.',
+      'The sector standard sets which topics must be assessed for materiality (GRI 3-1); topics judged not material require an explanation in the content index.');
+  }
+}
+
+</script>
+</body>
+</html>
